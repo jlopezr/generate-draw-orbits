@@ -26,7 +26,7 @@ last_point_plot = ax.scatter([], [], color='red', s=50, label='Last Point')  # S
 earth_circle = plt.Circle((0, 0), R_EARTH, color='orange', fill=False, label='Earth Surface')
 ax.add_artist(earth_circle)
 
-# Set plot limits (adjust as necessary)
+# Set initial plot limits
 ax.set_xlim(-7e6, 7e6)
 ax.set_ylim(-7e6, 7e6)
 ax.set_aspect('equal', 'box')
@@ -87,12 +87,19 @@ for line in sys.stdin:
         earth_slice = draw_earth_slice(z)
         ax.add_artist(earth_slice)
 
-        ax.relim()  # Recalculate limits
-        ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
+        # Check if the new point is outside the current limits and update limits if necessary
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+        if abs(x) > max(abs(xlim[0]), abs(xlim[1])) or abs(y) > max(abs(ylim[0]), abs(ylim[1])):
+            new_xlim = max(abs(xlim[0]), abs(xlim[1]), abs(x)) * 1.1
+            new_ylim = max(abs(ylim[0]), abs(ylim[1]), abs(y)) * 1.1
+            ax.set_xlim(-new_xlim, new_xlim)
+            ax.set_ylim(-new_ylim, new_ylim)
+            # Debugging information
+            print(f"Updated plot limits: xlim={ax.get_xlim()}, ylim={ax.get_ylim()}")
+    
         plt.draw()
         fig.canvas.flush_events()  # Force a redraw of the plot
-    # else:
-    #     print("Error parsing line: " + line)
 
 # Show the final plot when the input ends
 plt.ioff()

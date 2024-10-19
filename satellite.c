@@ -75,7 +75,15 @@ int main(int argc, char *argv[]) {
 
     // Parse command-line arguments
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--wait") == 0) {
+        if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            printf("Usage: %s [--wait] [--ecef] [inclination]\n", argv[0]);
+            printf("Simulate a satellite in an inclined orbit around the Earth.\n");
+            printf("  --wait: Wait between each step to simulate real time.\n");
+            printf("  --ecef: Use Earth-Centered, Earth-Fixed (ECEF) coordinates.\n");
+            printf("  inclination: Inclination of the orbit in degrees (default: 0).\n");
+            return 0;
+        }
+        else if (strcmp(argv[i], "--wait") == 0) {
             wait = 1;
         } else if (strcmp(argv[i], "--ecef") == 0) {
             ecef = 1;
