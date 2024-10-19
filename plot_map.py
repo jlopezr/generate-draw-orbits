@@ -5,6 +5,7 @@ import matplotlib
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 import signal
+import argparse
 
 # Use TkAgg backend for interactive plotting
 matplotlib.use('TkAgg')
@@ -19,13 +20,28 @@ lons = []
 # Constants
 R_EARTH = 6371000  # Radius of Earth in meters
 
+# Argument parser setup
+parser = argparse.ArgumentParser(description='Plot satellite orbit on a map.')
+parser.add_argument('--mill', action='store_true', help='Use Miller Cylindrical projection')
+parser.add_argument('--cyl', action='store_true', help='Use Cylindrical Equidistant projection')
+parser.add_argument('--ortho', action='store_true', help='Use Orthographic projection')
+parser.add_argument('--ortho-follow', action='store_true', help='Use Orthographic projection and follow the satellite')
+args = parser.parse_args()
+
+# Determine the projection to use
+if args.mill:
+    projection = 'mill'
+elif args.cyl:
+    projection = 'cyl'
+elif args.ortho or args.ortho_follow:
+    projection = 'ortho'
+else:
+    projection = 'cyl'  # Default projection
+
 # Set up the plot
 plt.ion()  # Turn on interactive mode for dynamic updates
 fig, ax = plt.subplots(figsize=(15, 10))
-m = Basemap(projection='mill', ax=ax)
-
-# Draw the Blue Marble image
-#m.bluemarble()
+m = Basemap(projection=projection, lat_0=0, lon_0=0, ax=ax)
 
 # Draw the map boundary and fill the background with blue (for seas)
 m.drawmapboundary(fill_color='aqua')
@@ -56,6 +72,8 @@ signal.signal(signal.SIGINT, on_close)
 
 # Function to convert X, Y, Z to latitude and longitude
 def xyz_to_latlon(x, y, z):
+    if abs(z / R_EARTH) > 1:
+        return None, None  # Invalid latitude
     lat = np.degrees(np.arcsin(z / R_EARTH))
     lon = np.degrees(np.arctan2(y, x))
     return lat, lon
@@ -83,6 +101,9 @@ for line in sys.stdin:
 
         # Convert to latitude and longitude
         lat, lon = xyz_to_latlon(x, y, z)
+        if lat is None or lon is None:
+            print("Invalid latitude or longitude, skipping this point.")
+            continue
 
         # Append the new position to the lists
         if lons and crosses_180(lons[-1], lon):
@@ -92,6 +113,15 @@ for line in sys.stdin:
 
         lats.append(lat)
         lons.append(lon)
+
+        # Update the map center to follow the satellite if ortho-follow is enabled
+        if args.ortho_follow:
+            ax.clear()
+            m = Basemap(projection='ortho', lat_0=lat, lon_0=lon, ax=ax)
+            m.drawmapboundary(fill_color='aqua')
+            m.fillcontinents(color='orange', lake_color='aqua')
+            m.drawcoastlines()
+            m.drawcountries()
 
         # Update the plot
         x_map, y_map = m(lons, lats)

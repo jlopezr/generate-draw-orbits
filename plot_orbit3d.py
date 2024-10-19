@@ -4,9 +4,15 @@ import re
 import matplotlib
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import argparse
 
 # Use TkAgg backend for interactive plotting
 matplotlib.use('TkAgg')
+
+# Argument parser setup
+parser = argparse.ArgumentParser(description='Plot satellite orbit in 3D.')
+parser.add_argument('--follow', action='store_true', help='Follow the satellite with the view')
+args = parser.parse_args()
 
 # Regular expression to extract the X, Y, and Z coordinates from the input
 regex = re.compile(r"Position: \(X: ([\d\.-]+) m, Y: ([\d\.-]+) m, Z: ([\d\.-]+) m\)")
@@ -94,12 +100,17 @@ for line in sys.stdin:
         orbit_plot.set_data(x_vals, y_vals)
         orbit_plot.set_3d_properties(z_vals)
         last_point_plot._offsets3d = (x_vals[-1:], y_vals[-1:], z_vals[-1:])  # Update the last point
+
+        if args.follow:
+            # Calculate the azimuth and elevation angles
+            azim = np.degrees(np.arctan2(y, x))
+            elev = np.degrees(np.arctan2(z, np.sqrt(x**2 + y**2)))
+            ax.view_init(elev=elev, azim=azim)
+
         ax.relim()  # Recalculate limits
         ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
         plt.draw()
         fig.canvas.flush_events()  # Force a redraw of the plot
-    # else:
-    #     print("Error parsing line: " + line)
 
 # Show the final plot when the input ends
 plt.ioff()
