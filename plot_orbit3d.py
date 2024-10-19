@@ -31,7 +31,21 @@ u, v = np.mgrid[0:2*np.pi:100j, 0:np.pi:50j]
 x_sphere = R_EARTH * np.cos(u) * np.sin(v)
 y_sphere = R_EARTH * np.sin(u) * np.sin(v)
 z_sphere = R_EARTH * np.cos(v)
-ax.plot_wireframe(x_sphere, y_sphere, z_sphere, color='orange', label='Earth Surface')
+ax.plot_wireframe(x_sphere, y_sphere, z_sphere, color='orange', alpha=0.3, label='Earth Surface')
+
+# Draw the equator
+theta = np.linspace(0, 2 * np.pi, 100)
+x_equator = R_EARTH * np.cos(theta)
+y_equator = R_EARTH * np.sin(theta)
+z_equator = np.zeros_like(theta)
+ax.plot(x_equator, y_equator, z_equator, color='green', label='Equator')
+
+# Draw the Greenwich meridian
+phi = np.linspace(-np.pi / 2, np.pi / 2, 100)
+x_meridian = R_EARTH * np.cos(phi)
+y_meridian = np.zeros_like(phi)
+z_meridian = R_EARTH * np.sin(phi)
+ax.plot(x_meridian, y_meridian, z_meridian, color='yellow', linewidth=2, label='Greenwich Meridian')
 
 # Set plot limits (adjust as necessary)
 ax.set_xlim(-7e6, 7e6)

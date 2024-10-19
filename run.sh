@@ -1,2 +1,2 @@
 #!/bin/bash
-make run
+make run-kepler
