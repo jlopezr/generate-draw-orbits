@@ -2,6 +2,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 // Constants
 const double G = 6.67430e-11;  // Gravitational constant (m^3 kg^-1 s^-2)
@@ -12,7 +13,7 @@ const double SIMULATION_TIME = 60.0;  // Simulation time for one complete orbit 
 const int N_STEPS = 360;        // Number of steps for the simulation
 
 // Function to simulate orbit and print position (X, Y, Z) and velocity to stdout
-void simulate_orbit(int wait) {
+void simulate_orbit(int wait, double inclination) {
     double r = R_EARTH + ALTITUDE;  // Total distance from Earth's center to satellite (meters)
     double velocity = sqrt(G * M / r);  // Orbital velocity (m/s)
     double real_orbital_period = 5520.0;  // Real orbital period (seconds), 1h32m = 5520 seconds
@@ -20,12 +21,13 @@ void simulate_orbit(int wait) {
     double real_time_step = real_orbital_period / N_STEPS;  // Real time between each step (seconds)
     double simulated_time_step = real_time_step / time_compression_factor;  // Simulated time step (seconds)
 
-    printf("Simulating satellite in equatorial orbit:\n");
+    printf("Simulating satellite in inclined orbit:\n");
     printf("Orbital radius: %.2f meters\n", r);
     printf("Orbital velocity: %.2f meters/second\n", velocity);
     printf("Real orbital period: %.2f seconds\n", real_orbital_period);
     printf("Time compression factor: %.2f\n", time_compression_factor);
-    printf("Simulated time step: %.3f seconds\n\n", simulated_time_step);
+    printf("Simulated time step: %.3f seconds\n", simulated_time_step);
+    printf("Inclination: %.2f degrees\n\n", inclination * 180.0 / M_PI);
 
     // Main simulation loop
     double simulated_time = 0.0;  // Initialize the simulated time
@@ -33,8 +35,8 @@ void simulate_orbit(int wait) {
         double time = i * real_time_step;  // Real orbital time
         double angle = 2 * M_PI * (time / real_orbital_period);  // Angle in radians
         double x = r * cos(angle);  // X-coordinate (meters)
-        double y = r * sin(angle);  // Y-coordinate (meters)
-        double z = 0.0;  // Z-coordinate (meters), always 0 for equatorial orbit
+        double y = r * sin(angle) * cos(inclination);  // Y-coordinate (meters)
+        double z = r * sin(angle) * sin(inclination);  // Z-coordinate (meters)
 
         // Print the current simulated time, position (X, Y, Z), and velocity
         printf("Simulated Time: %.2f s | Position: (X: %.2f m, Y: %.2f m, Z: %.2f m) | Velocity: %.2f m/s\n",
@@ -57,12 +59,18 @@ void simulate_orbit(int wait) {
 
 int main(int argc, char *argv[]) {
     int wait = 0;  // Default to not waiting
+    double inclination = 0;  // Default inclination (0 degrees)
 
-    // Check for the --wait argument
-    if (argc > 1 && strcmp(argv[1], "--wait") == 0) {
-        wait = 1;
+    // Parse command-line arguments
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--wait") == 0) {
+            wait = 1;
+        } else {
+            // Assume any other argument is the inclination in degrees
+            inclination = atof(argv[i]) * M_PI / 180.0;
+        }
     }
 
-    simulate_orbit(wait);
+    simulate_orbit(wait, inclination);
     return 0;
 }
