@@ -64,21 +64,17 @@ for line in sys.stdin:
 
         print(f"X: {x}, Y: {y}, Z: {z}")
 
-        # Check if the satellite is outside the Earth's radius
-        if (x**2 + y**2)**0.5 > R_EARTH:
-            # Append the new position to the lists
-            x_vals.append(x)
-            y_vals.append(y)
+        # Append the new position to the lists
+        x_vals.append(x)
+        y_vals.append(y)
 
-            # Update the plot
-            orbit_plot.set_data(x_vals, y_vals)
-            last_point_plot.set_offsets([[x_vals[-1], y_vals[-1]]])  # Update the last point
-            ax.relim()  # Recalculate limits
-            ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
-            plt.draw()
-            fig.canvas.flush_events()  # Force a redraw of the plot
-        else:
-            print("Satellite position is within the Earth's radius, skipping this point.")
+        # Update the plot
+        orbit_plot.set_data(x_vals, y_vals)
+        last_point_plot.set_offsets([[x_vals[-1], y_vals[-1]]])  # Update the last point
+        ax.relim()  # Recalculate limits
+        ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
+        plt.draw()
+        fig.canvas.flush_events()  # Force a redraw of the plot
     # else:
     #     print("Error parsing line: " + line)
 
