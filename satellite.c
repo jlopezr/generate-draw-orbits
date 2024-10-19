@@ -50,8 +50,8 @@ void simulate_orbit(int wait, double inclination, int ecef) {
         }
 
         // Print the current simulated time, position (X, Y, Z), and velocity
-        printf("Simulated Time: %.2f s | Position: (X: %.2f m, Y: %.2f m, Z: %.2f m) | Velocity: %.2f m/s\n",
-               simulated_time, x, y, z, velocity);
+        printf("Step %d | Time: %.2f s | Position: (X: %.2f m, Y: %.2f m, Z: %.2f m) | Velocity: %.2f m/s\n",
+               i, simulated_time, x, y, z, velocity);
 
         fflush(stdout);
 
