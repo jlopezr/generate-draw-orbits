@@ -40,6 +40,8 @@ void simulate_orbit(int wait) {
         printf("Simulated Time: %.2f s | Position: (X: %.2f m, Y: %.2f m, Z: %.2f m) | Velocity: %.2f m/s\n",
                simulated_time, x, y, z, velocity);
 
+        fflush(stdout);
+
         // Increment the simulated time
         simulated_time += simulated_time_step * time_compression_factor;
 

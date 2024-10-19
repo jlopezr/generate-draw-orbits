@@ -27,6 +27,10 @@ $(TARGET): $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Run the program and pipe output to Python script
+run: $(TARGET)
+	./$(TARGET) | python3 plot_orbit.py
+
 # Clean up build files
 clean:
 	rm -f $(TARGET) $(OBJS)
