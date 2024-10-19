@@ -2,9 +2,12 @@
 
 This project simulates satellite orbits and visualizes them in 2D and 3D using Python and C. The project includes tools to simulate satellite orbits using Keplerian elements and visualize the orbits on a map or in a 3D plot.
 
-![Satellite Orbit](orbit.png)
-![Satellite Orbit in 3D](orbit3d.png)
-![Satellite Orbit projected to a map](map.png)
+<div align="center">
+  <img src="orbit.png" alt="Satellite Orbit" />
+  <img src="orbit3d.png" alt="Satellite Orbit in 3D" />
+  <img src="map.png" alt="Satellite Orbit projected to a map" />
+</div>
+
 ## Project Structure
 
 Two simulations are included in this project:
@@ -72,6 +75,7 @@ The C programs accept extra parameters to customize the simulation:
 - `-W` or `--wait`: Waits between steps to simulate real-time motion. In one minute, the satellite will move approximately one orbit (5380 seconds = 89.67 minutes).
 - `-x` or `--example`: Use a predefined example orbit.
 
+Available examples are: LEO, GEO, Molniya, SSO, EquatorialCircular, EquatorialElliptic, Inclined.
 
 The python scripts accept extra parameters to customize the visualization:
 
