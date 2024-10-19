@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
 
 // Constants
 const double G = 6.67430e-11;  // Gravitational constant (m^3 kg^-1 s^-2)
@@ -11,7 +12,7 @@ const double SIMULATION_TIME = 60.0;  // Simulation time for one complete orbit 
 const int N_STEPS = 360;        // Number of steps for the simulation
 
 // Function to simulate orbit and print position (X, Y, Z) and velocity to stdout
-void simulate_orbit() {
+void simulate_orbit(int wait) {
     double r = R_EARTH + ALTITUDE;  // Total distance from Earth's center to satellite (meters)
     double velocity = sqrt(G * M / r);  // Orbital velocity (m/s)
     double real_orbital_period = 5520.0;  // Real orbital period (seconds), 1h32m = 5520 seconds
@@ -42,15 +43,24 @@ void simulate_orbit() {
         // Increment the simulated time
         simulated_time += simulated_time_step * time_compression_factor;
 
-        // Sleep to simulate real time
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = (long)(simulated_time_step * 1e9);  // Convert seconds to nanoseconds
-        nanosleep(&ts, NULL);
+        // Sleep to simulate real time if wait is true
+        if (wait) {
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = (long)(simulated_time_step * 1e9);  // Convert seconds to nanoseconds
+            nanosleep(&ts, NULL);
+        }
     }
 }
 
-int main() {
-    simulate_orbit();
+int main(int argc, char *argv[]) {
+    int wait = 0;  // Default to not waiting
+
+    // Check for the --wait argument
+    if (argc > 1 && strcmp(argv[1], "--wait") == 0) {
+        wait = 1;
+    }
+
+    simulate_orbit(wait);
     return 0;
 }
