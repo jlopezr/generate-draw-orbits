@@ -11,9 +11,10 @@ const double R_EARTH = 6371000;  // Radius of Earth (meters)
 const double ALTITUDE = 400000;  // Altitude of satellite above Earth's surface (meters)
 const double SIMULATION_TIME = 60.0;  // Simulation time for one complete orbit (seconds)
 const int N_STEPS = 360;        // Number of steps for the simulation
+const double EARTH_ROTATION_RATE = 7.2921159e-5;  // Earth's rotational rate (radians/second)
 
 // Function to simulate orbit and print position (X, Y, Z) and velocity to stdout
-void simulate_orbit(int wait, double inclination) {
+void simulate_orbit(int wait, double inclination, int ecef) {
     double r = R_EARTH + ALTITUDE;  // Total distance from Earth's center to satellite (meters)
     double velocity = sqrt(G * M / r);  // Orbital velocity (m/s)
     double real_orbital_period = 5520.0;  // Real orbital period (seconds), 1h32m = 5520 seconds
@@ -27,7 +28,8 @@ void simulate_orbit(int wait, double inclination) {
     printf("Real orbital period: %.2f seconds\n", real_orbital_period);
     printf("Time compression factor: %.2f\n", time_compression_factor);
     printf("Simulated time step: %.3f seconds\n", simulated_time_step);
-    printf("Inclination: %.2f degrees\n\n", inclination * 180.0 / M_PI);
+    printf("Inclination: %.2f degrees\n", inclination * 180.0 / M_PI);
+    printf("Using ECEF coordinates: %s\n\n", ecef ? "Yes" : "No");
 
     // Main simulation loop
     double simulated_time = 0.0;  // Initialize the simulated time
@@ -37,6 +39,15 @@ void simulate_orbit(int wait, double inclination) {
         double x = r * cos(angle);  // X-coordinate (meters)
         double y = r * sin(angle) * cos(inclination);  // Y-coordinate (meters)
         double z = r * sin(angle) * sin(inclination);  // Z-coordinate (meters)
+
+        if (ecef) {
+            // Account for Earth's rotation to convert to ECEF coordinates
+            double theta = EARTH_ROTATION_RATE * time;  // Earth's rotation angle
+            double x_ecef = x * cos(theta) - y * sin(theta);
+            double y_ecef = x * sin(theta) + y * cos(theta);
+            x = x_ecef;
+            y = y_ecef;
+        }
 
         // Print the current simulated time, position (X, Y, Z), and velocity
         printf("Simulated Time: %.2f s | Position: (X: %.2f m, Y: %.2f m, Z: %.2f m) | Velocity: %.2f m/s\n",
@@ -60,17 +71,20 @@ void simulate_orbit(int wait, double inclination) {
 int main(int argc, char *argv[]) {
     int wait = 0;  // Default to not waiting
     double inclination = 0;  // Default inclination (0 degrees)
+    int ecef = 0;  // Default to not using ECEF coordinates
 
     // Parse command-line arguments
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--wait") == 0) {
             wait = 1;
+        } else if (strcmp(argv[i], "--ecef") == 0) {
+            ecef = 1;
         } else {
             // Assume any other argument is the inclination in degrees
             inclination = atof(argv[i]) * M_PI / 180.0;
         }
     }
 
-    simulate_orbit(wait, inclination);
+    simulate_orbit(wait, inclination, ecef);
     return 0;
 }

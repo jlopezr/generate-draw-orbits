@@ -50,6 +50,16 @@ def on_close(event):
 # Connect the close event to the handler
 fig.canvas.mpl_connect('close_event', on_close)
 
+# Function to draw the Earth's slice at a given Z coordinate
+def draw_earth_slice(z):
+    slice_radius = (R_EARTH**2 - z**2)**0.5 if abs(z) <= R_EARTH else 0
+    earth_slice = plt.Circle((0, 0), slice_radius, color='orange', fill=False, linestyle='--', label='Earth Slice at Z')
+    return earth_slice
+
+# Initialize the Earth's slice
+earth_slice = draw_earth_slice(0)
+ax.add_artist(earth_slice)
+
 # Read from standard input in real-time
 for line in sys.stdin:
     if window_closed:
@@ -71,6 +81,12 @@ for line in sys.stdin:
         # Update the plot
         orbit_plot.set_data(x_vals, y_vals)
         last_point_plot.set_offsets([[x_vals[-1], y_vals[-1]]])  # Update the last point
+
+        # Remove the old Earth's slice and add the new one
+        earth_slice.remove()
+        earth_slice = draw_earth_slice(z)
+        ax.add_artist(earth_slice)
+
         ax.relim()  # Recalculate limits
         ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
         plt.draw()
