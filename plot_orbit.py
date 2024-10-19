@@ -20,6 +20,7 @@ R_EARTH = 6371000  # Radius of Earth in meters
 plt.ion()  # Turn on interactive mode for dynamic updates
 fig, ax = plt.subplots()
 orbit_plot, = ax.plot([], [], 'bo-', label='Satellite Orbit', markersize=2)  # Line for the orbit with smaller markers
+last_point_plot = ax.scatter([], [], color='red', s=50, label='Last Point')  # Scatter plot for the last point
 
 # Draw the Earth's surface as a circle
 earth_circle = plt.Circle((0, 0), R_EARTH, color='orange', fill=False, label='Earth Surface')
@@ -28,10 +29,10 @@ ax.add_artist(earth_circle)
 # Set plot limits (adjust as necessary)
 ax.set_xlim(-7e6, 7e6)
 ax.set_ylim(-7e6, 7e6)
-ax.set_aspect('equal', 'box') 
+ax.set_aspect('equal', 'box')
 ax.set_xlabel('X (meters)')
 ax.set_ylabel('Y (meters)')
-ax.set_title('Satellite Equatorial Orbit')
+ax.set_title('Satellite Equatorial Orbit (View from North Pole)')
 ax.grid(True)
 ax.legend()
 
@@ -63,16 +64,21 @@ for line in sys.stdin:
 
         print(f"X: {x}, Y: {y}, Z: {z}")
 
-        # Append the new position to the lists
-        x_vals.append(x)
-        y_vals.append(y)
+        # Check if the satellite is outside the Earth's radius
+        if (x**2 + y**2)**0.5 > R_EARTH:
+            # Append the new position to the lists
+            x_vals.append(x)
+            y_vals.append(y)
 
-        # Update the plot
-        orbit_plot.set_data(x_vals, y_vals)
-        ax.relim()  # Recalculate limits
-        ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
-        plt.draw()
-        fig.canvas.flush_events()  # Force a redraw of the plot
+            # Update the plot
+            orbit_plot.set_data(x_vals, y_vals)
+            last_point_plot.set_offsets([[x_vals[-1], y_vals[-1]]])  # Update the last point
+            ax.relim()  # Recalculate limits
+            ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
+            plt.draw()
+            fig.canvas.flush_events()  # Force a redraw of the plot
+        else:
+            print("Satellite position is within the Earth's radius, skipping this point.")
     # else:
     #     print("Error parsing line: " + line)
 
