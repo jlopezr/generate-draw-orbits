@@ -24,6 +24,7 @@ plt.ion()  # Turn on interactive mode for dynamic updates
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 orbit_plot, = ax.plot([], [], [], 'bo-', label='Satellite Orbit', markersize=2)  # Line for the orbit with smaller markers
+last_point_plot = ax.scatter([], [], [], color='red', s=50, label='Last Point')  # Scatter plot for the last point
 
 # Draw the Earth's surface as a sphere
 u, v = np.mgrid[0:2*np.pi:100j, 0:np.pi:50j]
@@ -78,6 +79,7 @@ for line in sys.stdin:
         # Update the plot
         orbit_plot.set_data(x_vals, y_vals)
         orbit_plot.set_3d_properties(z_vals)
+        last_point_plot._offsets3d = (x_vals[-1:], y_vals[-1:], z_vals[-1:])  # Update the last point
         ax.relim()  # Recalculate limits
         ax.autoscale_view(True, True, True)  # Autoscale the plot to fit new data
         plt.draw()
