@@ -18,8 +18,8 @@ This project simulates satellite orbits and visualizes them in 2D and 3D using P
 1. **Clone the repository:**
 
     ```sh
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/jlopezr/generate-draw-orbits.git
+    cd generate-draw-orbits
     ```
 
 2. **Create and activate a virtual environment:**
