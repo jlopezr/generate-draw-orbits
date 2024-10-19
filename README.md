@@ -2,6 +2,8 @@
 
 This project simulates satellite orbits and visualizes them in 2D and 3D using Python and C. The project includes tools to simulate satellite orbits using Keplerian elements and visualize the orbits on a map or in a 3D plot.
 
+![Satellite Orbit](kepler.png)
+
 ## Project Structure
 
 
